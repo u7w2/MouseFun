@@ -2,7 +2,8 @@ TODO:
 
 Pre-Alpha:
 - Detect all monitors `currently EnumDisplayMonitors() doesn't work on my machine`
-- Fix Timing `use one thread for calculating, another thread for setting cursor and sleep`
+- Fix timing `use one thread for calculating, another thread for setting cursor and sleep`
+- Fix infinite bounce
 
 
 Alpha:
