@@ -20,28 +20,28 @@ static BOOL CALLBACK getMonitors(HMONITOR hMon, HDC hdc, LPRECT lprcMonitor, LPA
 	UINT DPIx;
 	UINT DPIy;
 	GetDpiForMonitor(hMon, MDT_RAW_DPI, &DPIx, &DPIy);
-	newmon.gravity = DPIy / 25;
+	newmon.gravity = DPIy / 25; // for realistic gravity at 9.8067m/s^2 it should be ~ x2.7 at 144hz tickrate
 
 	monitors->push_back(newmon);
 	return 0;
 }
 
 int main(int argc, char* argv[]) {
-	monitor tmp;
+	/*monitor tmp;
 	tmp.rect.left = 0;
 	tmp.rect.top = 0;
 	tmp.rect.right = 1280;
 	tmp.rect.bottom = 720;
-	tmp.gravity = 5;
+	tmp.gravity = 5;*/
 	std::vector<monitor> monitors;
-	monitors.push_back(tmp);
+	/*monitors.push_back(tmp);
 	tmp.rect.left = 1280;
 	tmp.rect.top = 400;
 	tmp.rect.right = 1880;
 	tmp.rect.bottom = 1060;
-	monitors.push_back(tmp);
+	monitors.push_back(tmp);*/
 	
-	//EnumDisplayMonitors(NULL, NULL, getMonitors, (LPARAM)&monitors);
+	EnumDisplayMonitors(NULL, NULL, getMonitors, (LPARAM)&monitors);
 
 	const int tickrate = 7;
 	const double drag = 1;
@@ -111,7 +111,8 @@ int main(int argc, char* argv[]) {
 * 
 * urgent:
 * fix multiple monitors - make it functional on multiple rectangles
-* then make it detect all monitors (currently EnumDisplayMonitors() doesn't seem to work)
+   then make it detect all monitors (currently EnumDisplayMonitors() doesn't seem to work)
+* fix timing - use one thread for calculating, another thread for setting cursor and sleep
 * 
 * 
 * next step:
