@@ -7,6 +7,7 @@ Pre-Alpha:
 
 Alpha:
 - Using mouse applies a force on cursor's centre of mass `instead of an absolute shift in position, use f=ma`
+- Use elasticity on bounces instead `pushing mouse right into the right wall creates force that compresses the cursor and bounces it back`
 - Get current theme's main cursor, generate all rotations of it
 - Calculate centre of mass of the cursor based on all opaque pixels
 - Generate bounding box based on cursor's edges, store as vertices
@@ -17,7 +18,6 @@ Alpha:
 Beta:
 - Allow all cursor types `loading cursor and etc`
 - Simulate aerodynamics `navier-stokes equation? use opencl for this if possible`
-- Simulate friction on solid surfaces (monitor walls) `i.e. simulate grip, so at certain angle the cursor may slip instead of bouncing, but once it regains grip it can high-side like a motorbike`
 - Simulate density and buoyancy in fluid
 
 Release:
@@ -27,3 +27,4 @@ Release:
     - On collision of primary and secondary, apply momentum based on weight of both
 - Search for accelerometer devices. Instead of using artificial gravity, use the acceleration from the accelerometer.
   - Make sure it's based on the screen's angle, not the laptop base's angle `if laptop base is 90 degrees upright, and screen angle is 100 degrees (i.e. tilted down 10 degrees), cursor falls to top of screen`
+- Elastic deformation of cursor is visible
