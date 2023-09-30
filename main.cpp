@@ -20,19 +20,28 @@ static BOOL CALLBACK getMonitors(HMONITOR hMon, HDC hdc, LPRECT lprcMonitor, LPA
 	UINT DPIx;
 	UINT DPIy;
 	GetDpiForMonitor(hMon, MDT_RAW_DPI, &DPIx, &DPIy);
-	newmon.gravity = DPIy / 25; // for realistic gravity at 9.8067m/s^2 it should be ~ x2.7 at 144hz tickrate
+
+	// 9.8067m/s^2 = 9.8067mm/ms^2
+	// 1 DPI = 1/25.4 pixels per mm
+	// x = DPI / 25.4 * 9.8067 = DPI / 2.59
+	// x pixels per ms^2
+	// tickrate * x = pixels per tick^2 = DPI * tickrate / 2.59
+	// 
+	// for realistic gravity at 9.8067m/s^2 it should be approx x2.7 at 144hz tickrate apparently, but this value seems way too high
+
+	newmon.gravity = DPIy / 25;
 
 	monitors->push_back(newmon);
 	return 0;
 }
 
 int main(int argc, char* argv[]) {
+	// this doesn't appear to detect all monitors. Fix
 	std::vector<monitor> monitors;
-	
 	EnumDisplayMonitors(NULL, NULL, getMonitors, (LPARAM)&monitors);
 
 	const int tickrate = 7;
-	const double drag = 1;
+	// const double drag = 1;
 	const double bounciness = 0.8;
 
 	int gravity = monitors[0].gravity;
@@ -43,8 +52,8 @@ int main(int argc, char* argv[]) {
 		pastCursor = presentCursor;
 		GetCursorPos(&presentCursor);
 
-		velocity.x = (presentCursor.x - pastCursor.x) * drag;
-		velocity.y = (presentCursor.y - pastCursor.y + gravity) * drag;
+		velocity.x = (presentCursor.x - pastCursor.x);
+		velocity.y = (presentCursor.y - pastCursor.y + gravity);
 
 		futureCursor.x = presentCursor.x + velocity.x;
 		futureCursor.y = presentCursor.y + velocity.y;
