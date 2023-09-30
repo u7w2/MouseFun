@@ -27,19 +27,7 @@ static BOOL CALLBACK getMonitors(HMONITOR hMon, HDC hdc, LPRECT lprcMonitor, LPA
 }
 
 int main(int argc, char* argv[]) {
-	/*monitor tmp;
-	tmp.rect.left = 0;
-	tmp.rect.top = 0;
-	tmp.rect.right = 1280;
-	tmp.rect.bottom = 720;
-	tmp.gravity = 5;*/
 	std::vector<monitor> monitors;
-	/*monitors.push_back(tmp);
-	tmp.rect.left = 1280;
-	tmp.rect.top = 400;
-	tmp.rect.right = 1880;
-	tmp.rect.bottom = 1060;
-	monitors.push_back(tmp);*/
 	
 	EnumDisplayMonitors(NULL, NULL, getMonitors, (LPARAM)&monitors);
 
@@ -48,59 +36,61 @@ int main(int argc, char* argv[]) {
 	const double bounciness = 0.8;
 
 	int gravity = monitors[0].gravity;
-	POINT prevCursor, crCursor, velocity;
-	GetCursorPos(&crCursor);
+	POINT pastCursor, presentCursor, futureCursor, velocity;
+	GetCursorPos(&presentCursor);
 
 	while (true) {
-		prevCursor = crCursor;
-		GetCursorPos(&crCursor);
+		pastCursor = presentCursor;
+		GetCursorPos(&presentCursor);
 
-		velocity.x = (crCursor.x - prevCursor.x) * drag;
-		velocity.y = (crCursor.y - prevCursor.y + gravity) * drag;
+		velocity.x = (presentCursor.x - pastCursor.x) * drag;
+		velocity.y = (presentCursor.y - pastCursor.y + gravity) * drag;
 
-		int nextx = crCursor.x + velocity.x;
-		int nexty = crCursor.y + velocity.y;
+		futureCursor.x = presentCursor.x + velocity.x;
+		futureCursor.y = presentCursor.y + velocity.y;
 
-		// scans through all monitors
+		
+
+
 		bool outside = true;
-		int bouncewall;
-		bool xy;
+		int bouncewallX, bouncewallY;
+		bool bounceX = false;
+		bool bounceY = false;
 		for (monitor const &mon : monitors) {
-			if (nexty > mon.rect.bottom) {
-				bouncewall = mon.rect.bottom;
-				xy = true;
-				continue;
+			if (futureCursor.x < mon.rect.left && presentCursor.x >= mon.rect.left) {
+				bouncewallX = mon.rect.left;
+				bounceX = true;
 			}
-			if (nextx > mon.rect.right) {
-				bouncewall = mon.rect.right;
-				xy = false;
-				continue;
+			if (futureCursor.x > mon.rect.right && presentCursor.x <= mon.rect.right) {
+				bouncewallX = mon.rect.right;
+				bounceX = true;
 			}
-			if (nextx < mon.rect.left) {
-				bouncewall = mon.rect.left;
-				xy = false;
-				continue;
+			if (futureCursor.y < mon.rect.top && presentCursor.y >= mon.rect.top) {
+				bouncewallY = mon.rect.top;
+				bounceY = true;
 			}
-			if (nexty < mon.rect.top) {
-				bouncewall = mon.rect.top;
-				xy = true;
-				continue;
+			if (futureCursor.y > mon.rect.bottom && presentCursor.y <= mon.rect.bottom) {
+				bouncewallY = mon.rect.bottom;
+				bounceY = true;
 			}
-			gravity = mon.gravity;
-			outside = false;
-		}
-		if (outside) {
-			if (xy && (velocity.y > 10)) { // actually fix this stupid infinite loop instead of using this bs hack
-				nexty = bouncewall * 2 - nexty;
-				crCursor.y = nexty + velocity.y * bounciness / drag;
-			}
-			else if (!xy) {
-				nextx = bouncewall * 2 - nextx;
-				crCursor.x = nextx + velocity.x * bounciness;
+
+			if (futureCursor.x >= mon.rect.left && futureCursor.x <= mon.rect.right && futureCursor.y >= mon.rect.top && futureCursor.y <= mon.rect.bottom) {
+				outside = false;
+				gravity = mon.gravity;
 			}
 		}
 
-		SetCursorPos(nextx, nexty);
+		if (outside) {
+			if (bounceX) {
+				futureCursor.x = bouncewallX * 2 - futureCursor.x;
+				presentCursor.x = futureCursor.x + velocity.x * bounciness;
+			}
+			if (bounceY) {
+				futureCursor.y = bouncewallY * 2 - futureCursor.y;
+				presentCursor.y = futureCursor.y + velocity.y * bounciness;
+			}
+		}
+		SetCursorPos(futureCursor.x, futureCursor.y);
 		std::this_thread::sleep_for(std::chrono::milliseconds(tickrate));
 	}
 	
@@ -110,7 +100,7 @@ int main(int argc, char* argv[]) {
 /* TODO:
 * 
 * urgent:
-* fix multiple monitors - make it functional on multiple rectangles
+* fix multiple monitors - make it functional on multiple rectangles - done
    then make it detect all monitors (currently EnumDisplayMonitors() doesn't seem to work)
 * fix timing - use one thread for calculating, another thread for setting cursor and sleep
 * 
