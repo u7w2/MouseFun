@@ -2,7 +2,7 @@
 #include <WinUser.h>
 #include <ShellScalingApi.h>
 #include <vector>
-#include <algorithm>
+//#include <algorithm>
 #include <chrono>
 #include <thread>
 
@@ -48,6 +48,7 @@ int main(int argc, char* argv[]) {
 	POINT pastCursor, presentCursor, futureCursor, velocity;
 	GetCursorPos(&presentCursor);
 
+	// create ticker class
 	while (true) {
 		pastCursor = presentCursor;
 		GetCursorPos(&presentCursor);
