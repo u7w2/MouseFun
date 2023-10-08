@@ -6,7 +6,12 @@ Pre-Alpha:
 
 
 Alpha:
+- Use floating points
 - Using mouse applies a force on cursor's centre of mass `instead of an absolute shift in position, use f=ma`
+  - Real mouse cursor hidden
+  - Current cursor icon used to render fake cursor
+  - Distance travelled during tick is force
+  - Upon measurement, cursor position resets to calculated icon position
 - Use elasticity on bounces instead `pushing mouse right into the right wall creates force that compresses the cursor and bounces it back`
 - Get current theme's main cursor, generate all rotations of it
 - Calculate centre of mass of the cursor based on all opaque pixels
