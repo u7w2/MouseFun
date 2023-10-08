@@ -2,9 +2,9 @@
 #include <WinUser.h>
 #include <ShellScalingApi.h>
 #include <vector>
-//#include <algorithm>
-#include <chrono>
+#include <algorithm>
 #include <thread>
+#include <chrono>
 
 struct monitor {
 	RECT rect;
@@ -50,6 +50,8 @@ int main(int argc, char* argv[]) {
 
 	// create ticker class
 	while (true) {
+		auto x = std::chrono::steady_clock::now() + std::chrono::milliseconds(tickrate);
+
 		pastCursor = presentCursor;
 		GetCursorPos(&presentCursor);
 
@@ -63,27 +65,28 @@ int main(int argc, char* argv[]) {
 		int bouncewallX, bouncewallY;
 		bool bounceX = false;
 		bool bounceY = false;
-		for (monitor const &mon : monitors) {
-			if (futureCursor.x < mon.rect.left && presentCursor.x >= mon.rect.left) {
-				bouncewallX = mon.rect.left;
+		for (std::vector<monitor>::iterator mon = monitors.begin(); mon != monitors.end(); mon++) {
+			if (futureCursor.x < mon->rect.left && presentCursor.x >= mon->rect.left) {
+				bouncewallX = mon->rect.left;
 				bounceX = true;
 			}
-			if (futureCursor.x > mon.rect.right && presentCursor.x <= mon.rect.right) {
-				bouncewallX = mon.rect.right;
+			if (futureCursor.x > mon->rect.right && presentCursor.x <= mon->rect.right) {
+				bouncewallX = mon->rect.right;
 				bounceX = true;
 			}
-			if (futureCursor.y < mon.rect.top && presentCursor.y >= mon.rect.top) {
-				bouncewallY = mon.rect.top;
+			if (futureCursor.y < mon->rect.top && presentCursor.y >= mon->rect.top) {
+				bouncewallY = mon->rect.top;
 				bounceY = true;
 			}
-			if (futureCursor.y > mon.rect.bottom && presentCursor.y <= mon.rect.bottom) {
-				bouncewallY = mon.rect.bottom;
+			if (futureCursor.y > mon->rect.bottom && presentCursor.y <= mon->rect.bottom) {
+				bouncewallY = mon->rect.bottom;
 				bounceY = true;
 			}
 
-			if (futureCursor.x >= mon.rect.left && futureCursor.x <= mon.rect.right && futureCursor.y >= mon.rect.top && futureCursor.y <= mon.rect.bottom) {
+			if (futureCursor.x >= mon->rect.left && futureCursor.x <= mon->rect.right && futureCursor.y >= mon->rect.top && futureCursor.y <= mon->rect.bottom) {
 				outside = false;
-				gravity = mon.gravity;
+				std::rotate(monitors.begin(), mon, mon + 1);
+				break;
 			}
 		}
 
@@ -98,7 +101,8 @@ int main(int argc, char* argv[]) {
 			}
 		}
 		SetCursorPos(futureCursor.x, futureCursor.y);
-		std::this_thread::sleep_for(std::chrono::milliseconds(tickrate));
+
+		std::this_thread::sleep_until(x);
 	}
 	
 	return 0;

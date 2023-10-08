@@ -2,7 +2,6 @@ TODO:
 
 Pre-Alpha:
 - Detect all monitors `currently EnumDisplayMonitors() doesn't work on my machine`
-- Fix timing `use one thread for calculating, another thread for setting cursor and sleep`
 - Fix infinite bounce
 
 
@@ -18,8 +17,9 @@ Alpha:
 
 Beta:
 - Allow all cursor types `loading cursor and etc`
-- Simulate aerodynamics `navier-stokes equation? use opencl for this if possible`
+- Simulate aerodynamics `navier-stokes equations? use opencl for this`
 - Simulate density and buoyancy in fluid
+
 
 Release:
 - If cursor has two parts, detach the secondary part `like the main cursor + the loading ring`
