@@ -1,3 +1,4 @@
+#define OEMRESOURCE
 #include <Windows.h>
 #include <WinUser.h>
 #include <ShellScalingApi.h>
@@ -5,6 +6,7 @@
 #include <algorithm>
 #include <thread>
 #include <chrono>
+#include <iostream>
 
 struct monitor {
 	RECT rect;
@@ -49,9 +51,8 @@ int main(int argc, char* argv[]) {
 	GetCursorPos(&presentCursor);
 
 	// create ticker class
-	while (true) {
-		auto x = std::chrono::steady_clock::now() + std::chrono::milliseconds(tickrate);
-
+	auto x = std::chrono::steady_clock::now() + std::chrono::milliseconds(tickrate);
+	while (false) {
 		pastCursor = presentCursor;
 		GetCursorPos(&presentCursor);
 
@@ -100,10 +101,80 @@ int main(int argc, char* argv[]) {
 				presentCursor.y = futureCursor.y + velocity.y * bounciness;
 			}
 		}
+
 		SetCursorPos(futureCursor.x, futureCursor.y);
 
 		std::this_thread::sleep_until(x);
+		x += std::chrono::milliseconds(tickrate);
 	}
+
+	std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+
+	const HCURSOR hCursors[] = {
+		CopyCursor(LoadImage(NULL, MAKEINTRESOURCE(IDC_ARROW), IMAGE_CURSOR, 0, 0, LR_SHARED)),
+		CopyCursor(LoadImage(NULL, MAKEINTRESOURCE(IDC_IBEAM), IMAGE_CURSOR, 0, 0, LR_SHARED)),
+		CopyCursor(LoadImage(NULL, MAKEINTRESOURCE(IDC_WAIT), IMAGE_CURSOR, 0, 0, LR_SHARED)),
+		CopyCursor(LoadImage(NULL, MAKEINTRESOURCE(IDC_CROSS), IMAGE_CURSOR, 0, 0, LR_SHARED)),
+		CopyCursor(LoadImage(NULL, MAKEINTRESOURCE(IDC_UPARROW), IMAGE_CURSOR, 0, 0, LR_SHARED)),
+		CopyCursor(LoadImage(NULL, MAKEINTRESOURCE(IDC_SIZENWSE), IMAGE_CURSOR, 0, 0, LR_SHARED)),
+		CopyCursor(LoadImage(NULL, MAKEINTRESOURCE(IDC_SIZENESW), IMAGE_CURSOR, 0, 0, LR_SHARED)),
+		CopyCursor(LoadImage(NULL, MAKEINTRESOURCE(IDC_SIZEWE), IMAGE_CURSOR, 0, 0, LR_SHARED)),
+		CopyCursor(LoadImage(NULL, MAKEINTRESOURCE(IDC_SIZENS), IMAGE_CURSOR, 0, 0, LR_SHARED)),
+		CopyCursor(LoadImage(NULL, MAKEINTRESOURCE(IDC_SIZEALL), IMAGE_CURSOR, 0, 0, LR_SHARED)),
+		CopyCursor(LoadImage(NULL, MAKEINTRESOURCE(IDC_NO), IMAGE_CURSOR, 0, 0, LR_SHARED)),
+		CopyCursor(LoadImage(NULL, MAKEINTRESOURCE(IDC_HAND), IMAGE_CURSOR, 0, 0, LR_SHARED)),
+		CopyCursor(LoadImage(NULL, MAKEINTRESOURCE(IDC_APPSTARTING), IMAGE_CURSOR, 0, 0, LR_SHARED))
+	};
+
+	const DWORD OCRs[] = {
+		OCR_NORMAL,
+		OCR_IBEAM,
+		OCR_WAIT,
+		OCR_CROSS,
+		OCR_UP,
+		OCR_SIZENWSE,
+		OCR_SIZENESW,
+		OCR_SIZEWE,
+		OCR_SIZENS,
+		OCR_SIZEALL,
+		OCR_NO,
+		OCR_HAND,
+		OCR_APPSTARTING,
+	};
+	const HANDLE noCursorHandle = LoadCursorFromFile(L"nocursor.cur");
+	const HCURSOR noCursors[] = {
+		CopyCursor(noCursorHandle),
+		CopyCursor(noCursorHandle),
+		CopyCursor(noCursorHandle),
+		CopyCursor(noCursorHandle),
+		CopyCursor(noCursorHandle),
+		CopyCursor(noCursorHandle),
+		CopyCursor(noCursorHandle),
+		CopyCursor(noCursorHandle),
+		CopyCursor(noCursorHandle),
+		CopyCursor(noCursorHandle),
+		CopyCursor(noCursorHandle),
+		CopyCursor(noCursorHandle),
+		CopyCursor(noCursorHandle)
+	};
+
+	for (int i = 0; i < 13; i++) {
+		SetSystemCursor(noCursors[i], OCRs[i]);
+	}
+
+	int j = 0;
+	while (j++ < 10)
+	{
+		std::cout << j << "\n";
+		Sleep(1000);
+	}
+	//std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 	
+	for (int i = 0; i < 13; i++) {
+		SetSystemCursor(hCursors[i], OCRs[i]);
+		DestroyCursor(hCursors[i]);
+		DestroyCursor(noCursors[i]);
+	}
+
 	return 0;
 }

@@ -8,7 +8,7 @@ Pre-Alpha:
 Alpha:
 - Use floating points
 - Using mouse applies a force on cursor's centre of mass `instead of an absolute shift in position, use f=ma`
-  - Real mouse cursor hidden
+  - Real mouse cursor hidden --- done
   - Current cursor icon used to render fake cursor
   - Distance travelled during tick is force
   - Upon measurement, cursor position resets to calculated icon position
@@ -18,10 +18,10 @@ Alpha:
 - Generate bounding box based on cursor's edges, store as vertices
 - Bounce off vertices `calculate new trajectory based on rotation, vertex, and centre of mass`
   - Implement rotational inertia
+- Allow all cursor types `loading cursor and etc`
 
 
 Beta:
-- Allow all cursor types `loading cursor and etc`
 - Simulate aerodynamics `navier-stokes equations? use opencl for this`
 - Simulate density and buoyancy in fluid
 
@@ -34,3 +34,5 @@ Release:
 - Search for accelerometer devices. Instead of using artificial gravity, use the acceleration from the accelerometer.
   - Make sure it's based on the screen's angle, not the laptop base's angle `if laptop base is 90 degrees upright, and screen angle is 100 degrees (i.e. tilted down 10 degrees), cursor falls to top of screen`
 - Elastic deformation of cursor is visible
+- Clicking applies friction to screen `like pressing cursor against wall`
+  - Force applied while pressed is converted to elastic potential energy and is release when mouse is released
