@@ -1,8 +1,16 @@
 TODO:
 
-Pre-Alpha:
+Bugs to fix eventually:
 - Detect all monitors `currently EnumDisplayMonitors() doesn't work on my machine`
-- Fix infinite bounce
+- Fix infinite bounce `ignore until you use floating points`
+
+Current goals:
+- Be able to draw a custom cursor onto the screen `with transparency, and reset`
+- Clean up project structure
+  - Put global constant config variables in config header
+  - Create classes and functions for better code readability
+    - Create fake cursor class
+    - idek
 
 
 Alpha:

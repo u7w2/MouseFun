@@ -7,13 +7,21 @@
 #include <thread>
 #include <chrono>
 #include <iostream>
+#include "config.h"
+#include "fakeCursor.h"
+
+static HCURSOR realHCursors[13];
+
+void cleanUp() {
+	setRealCursors(realHCursors);
+}
 
 struct monitor {
 	RECT rect;
 	int gravity;
 };
 
-static BOOL CALLBACK getMonitors(HMONITOR hMon, HDC hdc, LPRECT lprcMonitor, LPARAM pData)
+BOOL CALLBACK getMonitors(HMONITOR hMon, HDC hdc, LPRECT lprcMonitor, LPARAM pData)
 {
 	std::vector<monitor>* monitors = (std::vector<monitor>*)pData;
 	monitor newmon;
@@ -21,7 +29,7 @@ static BOOL CALLBACK getMonitors(HMONITOR hMon, HDC hdc, LPRECT lprcMonitor, LPA
 
 	UINT DPIx;
 	UINT DPIy;
-	GetDpiForMonitor(hMon, MDT_RAW_DPI, &DPIx, &DPIy);
+	GetDpiForMonitor(hMon, DPIMode, &DPIx, &DPIy);
 
 	// 9.8067m/s^2 = 9.8067mm/ms^2
 	// 1 DPI = 1/25.4 pixels per mm
@@ -31,7 +39,7 @@ static BOOL CALLBACK getMonitors(HMONITOR hMon, HDC hdc, LPRECT lprcMonitor, LPA
 	// 
 	// for realistic gravity at 9.8067m/s^2 it should be approx x2.7 at 144hz tickrate apparently, but this value seems way too high
 
-	newmon.gravity = DPIy / 25;
+	newmon.gravity = DPIy * gravityScalar;
 
 	monitors->push_back(newmon);
 	return 0;
@@ -42,11 +50,6 @@ int main(int argc, char* argv[]) {
 	std::vector<monitor> monitors;
 	EnumDisplayMonitors(NULL, NULL, getMonitors, (LPARAM)&monitors);
 
-	const int tickrate = 7;
-	// const double drag = 1;
-	const double bounciness = 0.8;
-
-	int gravity = monitors[0].gravity;
 	POINT pastCursor, presentCursor, futureCursor, velocity;
 	GetCursorPos(&presentCursor);
 
@@ -57,7 +60,7 @@ int main(int argc, char* argv[]) {
 		GetCursorPos(&presentCursor);
 
 		velocity.x = (presentCursor.x - pastCursor.x);
-		velocity.y = (presentCursor.y - pastCursor.y + gravity);
+		velocity.y = (presentCursor.y - pastCursor.y + monitors[0].gravity);
 
 		futureCursor.x = presentCursor.x + velocity.x;
 		futureCursor.y = presentCursor.y + velocity.y;
@@ -108,73 +111,24 @@ int main(int argc, char* argv[]) {
 		x += std::chrono::milliseconds(tickrate);
 	}
 
-	std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+	getRealHCursors(realHCursors);
+	atexit(cleanUp);
 
-	const HCURSOR hCursors[] = {
-		CopyCursor(LoadImage(NULL, MAKEINTRESOURCE(IDC_ARROW), IMAGE_CURSOR, 0, 0, LR_SHARED)),
-		CopyCursor(LoadImage(NULL, MAKEINTRESOURCE(IDC_IBEAM), IMAGE_CURSOR, 0, 0, LR_SHARED)),
-		CopyCursor(LoadImage(NULL, MAKEINTRESOURCE(IDC_WAIT), IMAGE_CURSOR, 0, 0, LR_SHARED)),
-		CopyCursor(LoadImage(NULL, MAKEINTRESOURCE(IDC_CROSS), IMAGE_CURSOR, 0, 0, LR_SHARED)),
-		CopyCursor(LoadImage(NULL, MAKEINTRESOURCE(IDC_UPARROW), IMAGE_CURSOR, 0, 0, LR_SHARED)),
-		CopyCursor(LoadImage(NULL, MAKEINTRESOURCE(IDC_SIZENWSE), IMAGE_CURSOR, 0, 0, LR_SHARED)),
-		CopyCursor(LoadImage(NULL, MAKEINTRESOURCE(IDC_SIZENESW), IMAGE_CURSOR, 0, 0, LR_SHARED)),
-		CopyCursor(LoadImage(NULL, MAKEINTRESOURCE(IDC_SIZEWE), IMAGE_CURSOR, 0, 0, LR_SHARED)),
-		CopyCursor(LoadImage(NULL, MAKEINTRESOURCE(IDC_SIZENS), IMAGE_CURSOR, 0, 0, LR_SHARED)),
-		CopyCursor(LoadImage(NULL, MAKEINTRESOURCE(IDC_SIZEALL), IMAGE_CURSOR, 0, 0, LR_SHARED)),
-		CopyCursor(LoadImage(NULL, MAKEINTRESOURCE(IDC_NO), IMAGE_CURSOR, 0, 0, LR_SHARED)),
-		CopyCursor(LoadImage(NULL, MAKEINTRESOURCE(IDC_HAND), IMAGE_CURSOR, 0, 0, LR_SHARED)),
-		CopyCursor(LoadImage(NULL, MAKEINTRESOURCE(IDC_APPSTARTING), IMAGE_CURSOR, 0, 0, LR_SHARED))
-	};
+	HCURSOR noCursors[13];
+	getNoHCursors(noCursors, L"nocursor.cur");
+	HDC screenDC = GetDC(NULL);
+	//setRealCursors(noCursors);
 
-	const DWORD OCRs[] = {
-		OCR_NORMAL,
-		OCR_IBEAM,
-		OCR_WAIT,
-		OCR_CROSS,
-		OCR_UP,
-		OCR_SIZENWSE,
-		OCR_SIZENESW,
-		OCR_SIZEWE,
-		OCR_SIZENS,
-		OCR_SIZEALL,
-		OCR_NO,
-		OCR_HAND,
-		OCR_APPSTARTING,
-	};
-	const HANDLE noCursorHandle = LoadCursorFromFile(L"nocursor.cur");
-	const HCURSOR noCursors[] = {
-		CopyCursor(noCursorHandle),
-		CopyCursor(noCursorHandle),
-		CopyCursor(noCursorHandle),
-		CopyCursor(noCursorHandle),
-		CopyCursor(noCursorHandle),
-		CopyCursor(noCursorHandle),
-		CopyCursor(noCursorHandle),
-		CopyCursor(noCursorHandle),
-		CopyCursor(noCursorHandle),
-		CopyCursor(noCursorHandle),
-		CopyCursor(noCursorHandle),
-		CopyCursor(noCursorHandle),
-		CopyCursor(noCursorHandle)
-	};
+	DrawIcon(screenDC, 100, 100, realHCursors[0]);
+	Sleep(2000);
 
-	for (int i = 0; i < 13; i++) {
-		SetSystemCursor(noCursors[i], OCRs[i]);
-	}
-
-	int j = 0;
-	while (j++ < 10)
-	{
-		std::cout << j << "\n";
-		Sleep(1000);
-	}
-	//std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-	
-	for (int i = 0; i < 13; i++) {
-		SetSystemCursor(hCursors[i], OCRs[i]);
-		DestroyCursor(hCursors[i]);
-		DestroyCursor(noCursors[i]);
-	}
+	/*DrawIconEx(screenDC, 200, 300, realHCursors[0], 32, 32, 0, 0, DI_IMAGE | DI_DEFAULTSIZE);
+	Sleep(1000);
+	DrawIconEx(screenDC, 300, 300, realHCursors[0], 32, 32, 0, 0, DI_IMAGE | DI_DEFAULTSIZE);
+	Sleep(1000);
+	DrawIconEx(screenDC, 300, 400, realHCursors[0], 32, 32, 0, 0, DI_IMAGE | DI_DEFAULTSIZE);
+	Sleep(1000);
+	DrawIconEx(screenDC, 400, 400, realHCursors[0], 32, 32, 0, 0, DI_IMAGE | DI_DEFAULTSIZE);*/
 
 	return 0;
 }
