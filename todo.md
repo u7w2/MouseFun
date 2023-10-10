@@ -5,9 +5,8 @@ Bugs to fix eventually:
 - Fix infinite bounce `ignore until you use floating points`
 
 Current goals:
-- Be able to draw a custom cursor onto the screen `with transparency, and reset`
-  - Just find out how to draw a triangle directly to the screen with: Vulkan, D3D/dx, OpenGL
-    - Then you can think about drawing a bitmap, then a cursor, then make rotations of said cursor
+- Improve efficiency of fake cursor `make it fast and fluid instead of choppy`
+- Implement fake cursor code into fake cursor class
 
 
 Alpha:
@@ -24,6 +23,7 @@ Alpha:
 - Bounce off vertices `calculate new trajectory based on rotation, vertex, and centre of mass`
   - Implement rotational inertia
 - Allow all cursor types `loading cursor and etc`
+- Create cursor shadows
 
 
 Beta:
