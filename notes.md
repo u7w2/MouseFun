@@ -7,3 +7,10 @@ when you have to separate the cursor into two fakes, is it better to use two cur
 
 yeahahhhhhhhh I don't think I'll stick to WinAPI any more. SDL seems like a good option for drawing, Vulkan would be hella overkill but fun
 I can load the cursor icons another way, perhaps a way that's easier to control. Obviously taking over the Windows cursor must use WinAPI, but that's not a problem. I'll leave the complex stuff to the complex libraries, and windows stuff to WinAPI
+
+GLFW probably best... AYYOOOO LMAO I'm GONNA USE VULKAN AAHAHAHAHAHAHAHAHAHA
+
+https://www.youtube.com/watch?v=BIZyxja3Qls an option
+
+I have to create rotations of the cursor using opencv anyway, might as well start there by loading the bitmap in instead, could be easier
+do I need opencv? is it bloat?

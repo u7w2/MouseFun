@@ -6,11 +6,8 @@ Bugs to fix eventually:
 
 Current goals:
 - Be able to draw a custom cursor onto the screen `with transparency, and reset`
-- Clean up project structure
-  - Put global constant config variables in config header
-  - Create classes and functions for better code readability
-    - Create fake cursor class
-    - idek
+  - Just find out how to draw a triangle directly to the screen with: Vulkan, D3D/dx, OpenGL
+    - Then you can think about drawing a bitmap, then a cursor, then make rotations of said cursor
 
 
 Alpha:
