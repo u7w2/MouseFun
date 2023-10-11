@@ -127,17 +127,15 @@ int main(int argc, char* argv[]) {
 	HBITMAP tmpBMP = CreateCompatibleBitmap(compatDC, 32, 32);
 
 	DrawIcon(compatDC, 0, 0, realHCursors[0]);
-	for (int p = 0; p < 200; p++) { // works but it's sooooo bad
-		BitBlt(compatDC, 0, 0, 32, 32, screenDC, 100 + (p << 4), 100 + (p << 3), SRCCOPY);
+	for (int p = 0; p < 150; p++) { // eh
+		BitBlt(compatDC, 0, 0, 32, 32, screenDC, 100 + (p << 3), 100 + (p << 3), SRCCOPY);
+		DrawIcon(compatDC, 0, 0, realHCursors[0]);
 		SelectObject(tmpDC, tmpBMP);
-		BitBlt(tmpDC, 0, 0, 32, 32, screenDC, 100 + (p << 4), 100 + (p << 3), SRCCOPY);
+		BitBlt(screenDC, 100 + (p - 1 << 3), 100 + (p - 1 << 3), 32, 32, tmpDC, 0, 0, SRCCOPY);
+		BitBlt(tmpDC, 0, 0, 32, 32, screenDC, 100 + (p << 3), 100 + (p << 3), SRCCOPY);
 		SelectObject(compatDC, compatBMP);
-		DrawIcon(compatDC, 0, 0, realHCursors[1]);
-		BitBlt(screenDC, 100 + (p << 4), 100 + (p << 3), 32, 32, compatDC, 0, 0, SRCCOPY);
-		Sleep(7);
-		SelectObject(tmpDC, tmpBMP);
-		BitBlt(screenDC, 100 + (p << 4), 100 + (p << 3), 32, 32, tmpDC, 0, 0, SRCCOPY);
-		SelectObject(compatDC, compatBMP);
+		BitBlt(screenDC, 100 + (p << 3), 100 + (p << 3), 32, 32, compatDC, 0, 0, SRCCOPY);
+		//Sleep(1);
 	}
 	return 0;
 	DrawIconEx(compatDC, 200, 300, realHCursors[0], 32, 32, 0, 0, DI_NORMAL | DI_DEFAULTSIZE);

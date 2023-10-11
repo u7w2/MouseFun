@@ -14,3 +14,15 @@ https://www.youtube.com/watch?v=BIZyxja3Qls an option
 
 I have to create rotations of the cursor using opencv anyway, might as well start there by loading the bitmap in instead, could be easier
 do I need opencv? is it bloat?
+
+
+
+
+
+
+
+so I'm sticking to WinAPI still apparently. Maybe something will change when I have to generate rotations of every cursor... ugh
+
+
+----------
+I need to allow animated cursors to work somehow FUCK
